@@ -189,7 +189,86 @@ def day4(inputText):
     print(f"Day 4 Part 2: {sum * currentNumber}")
 
 
-days = [day1, day2, day3, day4]
+def day5(inputString):
+    lines = inputString.split("\n")[:-1]
+    intersections = [[0 for _ in range(1000)] for _ in range(1000)]
+
+    for l in lines:
+        p1, p2 = l.split(" -> ")
+        x1, y1 = map(int, p1.split(","))
+        x2, y2 = map(int, p2.split(","))
+        if x1 == x2 or y1 == y2:
+            length = max(abs(x1 - x2), abs(y1 - y2))
+            for t in range(length + 1):
+                # Lerp is amazing
+                x = ((length - t) * x1 + t * x2) / length
+                y = ((length - t) * y1 + t * y2) / length
+
+                # print(x, y)
+
+                intersections[int(y)][int(x)] += 1
+
+    count = 0
+    for y in range(1000):
+        for x in range(1000):
+            if intersections[y][x] >= 2:
+                count += 1
+    print(f"Day 5 Part 1: {count}")
+
+    intersections = [[0 for _ in range(1000)] for _ in range(1000)]
+
+    for l in lines:
+        p1, p2 = l.split(" -> ")
+        x1, y1 = map(int, p1.split(","))
+        x2, y2 = map(int, p2.split(","))
+        length = max(abs(x1 - x2), abs(y1 - y2))
+        for t in range(length + 1):
+            # Lerp is amazing
+            x = ((length - t) * x1 + t * x2) / length
+            y = ((length - t) * y1 + t * y2) / length
+
+            # print(x, y)
+
+            intersections[int(y)][int(x)] += 1
+
+    count = 0
+    for y in range(1000):
+        for x in range(1000):
+            if intersections[y][x] >= 2:
+                count += 1
+    print(f"Day 5 Part 2: {count}")
+
+
+def day6(inputString):
+    inputAges = list(map(int, inputString.split(",")))
+    ageCounts = [0 for _ in range(9)]
+
+    for a in inputAges:
+        ageCounts[a] += 1
+
+    for _ in range(80):
+        newFish = ageCounts[0]
+        for i in range(8):
+            ageCounts[i] = ageCounts[i + 1]
+        ageCounts[8] = newFish
+        ageCounts[6] += newFish
+    print(f"Day 6 Part 1: {sum(ageCounts)}")
+
+    ageCounts = [0 for _ in range(9)]
+
+    for a in inputAges:
+        ageCounts[a] += 1
+
+    for _ in range(256):
+        newFish = ageCounts[0]
+        for i in range(8):
+            ageCounts[i] = ageCounts[i + 1]
+        ageCounts[8] = newFish
+        ageCounts[6] += newFish
+    print(f"Day 6 Part 2: {sum(ageCounts)}")
+
+
+days = [day1, day2, day3, day4, day5, day6]
 
 
 def main():
