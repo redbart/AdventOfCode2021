@@ -1,3 +1,6 @@
+import ntpath
+
+
 def day1(inputText):
     inputs = list(map(int, inputText.split("\n")[:-1]))
     count = 0
@@ -90,7 +93,103 @@ def day3(inputText):
     print(f"Day 3 Part 2: {oxygen * carbon}")
 
 
-days = [day1, day2, day3]
+def day4(inputText):
+    boardsStrs = inputText.split("\n\n")
+    numbersOriginal = list(map(int, boardsStrs.pop(0).split(",")))
+    numbers = numbersOriginal[:]
+    boards = []
+
+    for b in boardsStrs:
+        board = []
+        for r in b.split("\n"):
+            for c in r.split(" "):
+                if c != "":
+                    board.append(int(c))
+        boards.append(board)
+
+    boardChecks = [[False for _ in range(25)] for _ in range(len(boards))]
+    winner = -1
+
+    currentNumber = 0
+    while winner < 0:
+        currentNumber = numbers.pop(0)
+
+        for i in range(len(boards)):
+            for j in range(len(boards[i])):
+                if boards[i][j] == currentNumber:
+                    boardChecks[i][j] = True
+
+        for i in range(len(boards)):
+            for x in range(5):
+                col = True
+                for y in range(5):
+                    if not boardChecks[i][y * 5 + x]:
+                        col = False
+                if col:
+                    winner = i
+            for y in range(5):
+                row = True
+                for x in range(5):
+                    if not boardChecks[i][y * 5 + x]:
+                        row = False
+                if row:
+                    winner = i
+
+    sum = 0
+    for i in range(len(boards[winner])):
+        if not boardChecks[winner][i]:
+            sum += boards[winner][i]
+
+    print(f"Day 4 Part 1: {sum * currentNumber}")
+
+    numbers = numbersOriginal[:]
+
+    boardChecks = [[False for _ in range(25)] for _ in range(len(boards))]
+    boardsOut = [False for _ in range(len(boards))]
+    loser = -1
+
+    currentNumber = 0
+    while loser < 0:
+        currentNumber = numbers.pop(0)
+
+        for i in range(len(boards)):
+            for j in range(len(boards[i])):
+                if boards[i][j] == currentNumber:
+                    boardChecks[i][j] = True
+
+        for i in range(len(boards)):
+            if not boardsOut[i]:
+                for x in range(5):
+                    col = True
+                    for y in range(5):
+                        if not boardChecks[i][y * 5 + x]:
+                            col = False
+                    if col:
+                        boardsOut[i] = True
+                        loser = i
+                        for j in range(len(boardsOut)):
+                            if not boardsOut[j]:
+                                loser = -1
+                for y in range(5):
+                    row = True
+                    for x in range(5):
+                        if not boardChecks[i][y * 5 + x]:
+                            row = False
+                    if row:
+                        boardsOut[i] = True
+                        loser = i
+                        for j in range(len(boardsOut)):
+                            if not boardsOut[j]:
+                                loser = -1
+    sum = 0
+    for i in range(len(boards[loser])):
+        if not boardChecks[loser][i]:
+            sum += boards[loser][i]
+
+    print(f"Day 4 Part 2: {sum * currentNumber}")
+
+
+days = [day1, day2, day3, day4]
 
 
 def main():
