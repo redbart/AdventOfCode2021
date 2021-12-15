@@ -268,7 +268,125 @@ def day6(inputString):
     print(f"Day 6 Part 2: {sum(ageCounts)}")
 
 
-days = [day1, day2, day3, day4, day5, day6]
+def day7(inputString):
+    positions = list(map(int, inputString.split(",")))
+
+    fuels = []
+    for bestPos in range(1000):
+        fuel = 0
+        for p in positions:
+            fuel += abs(p - bestPos)
+        fuels.append(fuel)
+    print(f"Day 7 Part 1: {min(fuels)}")
+
+    fuels = []
+    for bestPos in range(1000):
+        fuel = 0
+        for p in positions:
+            dist = abs(p - bestPos)
+            fuel += (dist * (dist + 1)) // 2
+        fuels.append(fuel)
+    print(f"Day 7 Part 2: {min(fuels)}")
+
+
+def day8(inputString):
+    lines = inputString.split("\n")[:-1]
+    sum = 0
+    for line in lines:
+        inputStr, outputStr = line.split(" | ")
+        inputSets = list(map(set, inputStr.split(" ")))
+        outputSets = list(map(set, outputStr.split(" ")))
+
+        lenNums = [0 for i in range(8)]
+
+        for out in outputSets:
+            lenNums[len(out)] += 1
+
+        sum += lenNums[2]
+        sum += lenNums[4]
+        sum += lenNums[3]
+        sum += lenNums[7]
+    print(f"Day 8 Part 1: {sum}")
+
+    sum = 0
+    for line in lines:
+        inputStr, outputStr = line.split(" | ")
+        inputSets = list(map(set, inputStr.split(" ")))
+        outputSets = list(map(set, outputStr.split(" ")))
+
+        segments = [' ' for i in range(7)]
+
+        letterCounts = [0 for i in range(7)]
+
+        for inputSet in inputSets:
+            for char in inputSet:
+                letterCounts[ord(char) - ord("a")] += 1
+
+        for i, count in enumerate(letterCounts):
+            if count == 6:
+                segments[1] = chr(i + ord("a"))
+            if count == 4:
+                segments[4] = chr(i + ord("a"))
+
+        digitOne = None
+        digitSeven = None
+        digitEight = None
+
+        for inputSet in inputSets:
+            if len(inputSet) == 2:
+                digitOne = inputSet
+            if len(inputSet) == 3:
+                digitSeven = inputSet
+            if len(inputSet) == 7:
+                digitEight = inputSet
+
+        segments[0], = (digitSeven - digitOne)
+
+        nineAndZero = []
+        digitSix = None
+        for inputSet in inputSets:
+            if len(inputSet) == 6:
+                if len(inputSet - digitOne) == 5:
+                    digitSix = inputSet
+                else:
+                    nineAndZero.append(inputSet)
+
+        segments[3], = ((nineAndZero[0] - nineAndZero[1]).union(nineAndZero[1] - nineAndZero[0])) - set(segments[4])
+        segments[2], = digitSeven - digitSix
+        segments[5], = digitOne - set(segments[2])
+        segments[6], = digitEight - set(segments)
+
+        digitDisplays = [{0, 1, 2, 4, 5, 6},
+                         {2, 5},
+                         {0, 2, 3, 4, 6},
+                         {0, 2, 3, 5, 6},
+                         {1, 2, 3, 5},
+                         {0, 1, 3, 5, 6},
+                         {0, 1, 3, 4, 5, 6},
+                         {0, 2, 5},
+                         {0, 1, 2, 3, 4, 5, 6},
+                         {0, 1, 2, 3, 5, 6}]
+
+        numberOutput = 0
+
+        for digitNum, out in enumerate(outputSets):
+            activeSegments = set()
+            for char in out:
+                for i in range(7):
+                    if segments[i] == char:
+                        activeSegments.add(i)
+                        break
+
+            for i, d in enumerate(digitDisplays):
+                if d == activeSegments:
+                    numberOutput += i * (10 ** (3 - digitNum))
+
+        sum += numberOutput
+
+    print(f"Day 8 Part 2: {sum}")
+
+
+days = [day1, day2, day3, day4, day5, day6, day7, day8]
 
 
 def main():
