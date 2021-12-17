@@ -386,7 +386,78 @@ def day8(inputString):
     print(f"Day 8 Part 2: {sum}")
 
 
-days = [day1, day2, day3, day4, day5, day6, day7, day8]
+def day9(inputString):
+    grid = [list(map(int, x)) for x in inputString.split("\n")][:-1]
+    sum = 0
+    for y in range(len(grid)):
+        for x in range(len(grid[y])):
+            minimum = True
+            for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+                if 0 <= y + dy < len(grid) and 0 <= x + dx < len(grid[y]):
+                    if grid[y + dy][x + dx] <= grid[y][x]:
+                        minimum = False
+            if minimum:
+                sum += 1 + grid[y][x]
+    print(f"Day 9 Part 1: {sum}")
+
+    basins = [[-1 for x in range(len(grid[y]))] for y in range(len(grid))]
+
+    basinNum = 0
+
+    for y in range(len(grid)):
+        for x in range(len(grid[y])):
+            if grid[y][x] == 9:
+                continue
+            if basins[y][x] != -1:
+                continue
+            currentX = x
+            currentY = y
+            while True:
+                minimum = None
+                minimumVal = 10
+                for dx, dy in ((0, -1), (0, 1), (-1, 0), (1, 0)):
+                    if 0 <= currentY + dy < len(grid) and 0 <= currentX + dx < len(grid[currentY]):
+                        if grid[currentY + dy][currentX + dx] <= grid[currentY][currentX]:
+                            if grid[currentY + dy][currentX + dx] < minimumVal:
+                                minimum = (dx, dy)
+                                minimumVal = grid[currentY + dy][currentX + dx]
+                if minimum is None:
+                    break
+                else:
+                    dx, dy = minimum
+                    currentX += dx
+                    currentY += dy
+                    print(currentX, currentY)
+            print("\n")
+            if basins[currentY][currentX] == -1:
+                basins[currentY][currentX] = basinNum
+                basins[y][x] = basinNum
+                basinNum += 1
+            else:
+                basins[y][x] = basins[currentY][currentX]
+
+    for y in range(len(grid)):
+        for x in range(len(grid[y])):
+            if basins[y][x] == -1:
+                print(" ", end="")
+            else:
+                print(basins[y][x] % 10, end="")
+        print()
+
+    basinSizes = [0 for i in range(basinNum)]
+
+    for y in range(len(basins)):
+        for x in range(len(basins[y])):
+            if basins[y][x] != -1:
+                basinSizes[basins[y][x]] += 1
+
+    basinSizes.sort()
+    print(basinSizes)
+    answer = basinSizes[-1] * basinSizes[-2] * basinSizes[-3]
+    print(f"Day 9 Part 1: {answer}")
+
+
+days = [day1, day2, day3, day4, day5, day6, day7, day8, day9]
 
 
 def main():
