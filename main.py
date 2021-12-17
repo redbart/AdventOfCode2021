@@ -427,8 +427,8 @@ def day9(inputString):
                     dx, dy = minimum
                     currentX += dx
                     currentY += dy
-                    print(currentX, currentY)
-            print("\n")
+                    # print(currentX, currentY)
+            # print("\n")
             if basins[currentY][currentX] == -1:
                 basins[currentY][currentX] = basinNum
                 basins[y][x] = basinNum
@@ -436,13 +436,13 @@ def day9(inputString):
             else:
                 basins[y][x] = basins[currentY][currentX]
 
-    for y in range(len(grid)):
-        for x in range(len(grid[y])):
-            if basins[y][x] == -1:
-                print(" ", end="")
-            else:
-                print(basins[y][x] % 10, end="")
-        print()
+    # for y in range(len(grid)):
+    #     for x in range(len(grid[y])):
+    #         if basins[y][x] == -1:
+    #             print(" ", end="")
+    #         else:
+    #             print(basins[y][x] % 10, end="")
+    #     print()
 
     basinSizes = [0 for i in range(basinNum)]
 
@@ -452,12 +452,125 @@ def day9(inputString):
                 basinSizes[basins[y][x]] += 1
 
     basinSizes.sort()
-    print(basinSizes)
     answer = basinSizes[-1] * basinSizes[-2] * basinSizes[-3]
-    print(f"Day 9 Part 1: {answer}")
+    print(f"Day 9 Part 2: {answer}")
 
 
-days = [day1, day2, day3, day4, day5, day6, day7, day8, day9]
+def day10(inputString):
+    inputLines = inputString.split("\n")[:-1]
+    part1Score = 0
+    part2Scores = []
+    for line in inputLines:
+        stack = []
+        corrupt = False
+        for c in line:
+            if c == "(":
+                stack.append(")")
+            if c == "[":
+                stack.append("]")
+            if c == "{":
+                stack.append("}")
+            if c == "<":
+                stack.append(">")
+            if c == ")":
+                if stack.pop() != c:
+                    part1Score += 3
+                    corrupt = True
+                    break
+            if c == "]":
+                if stack.pop() != c:
+                    part1Score += 57
+                    corrupt = True
+                    break
+            if c == "}":
+                if stack.pop() != c:
+                    part1Score += 1197
+                    corrupt = True
+                    break
+            if c == ">":
+                if stack.pop() != c:
+                    part1Score += 25137
+                    corrupt = True
+                    break
+        if not corrupt:
+            thisScore = 0
+            while len(stack) != 0:
+                c = stack.pop()
+                thisScore *= 5
+                if c == ")":
+                    thisScore += 1
+                if c == "]":
+                    thisScore += 2
+                if c == "}":
+                    thisScore += 3
+                if c == ">":
+                    thisScore += 4
+            part2Scores.append(thisScore)
+
+    print(f"Day 10 Part 1: {part1Score}")
+
+    part2Scores.sort()
+
+    print(part2Scores)
+    print(f"Day 10 Part 2: {part2Scores[len(part2Scores) // 2]}")
+
+
+def flash(energies, x, y):
+    newFlashes = 1
+    energies[y][x] = -1
+    for dy in (-1, 0, 1):
+        for dx in (-1, 0, 1):
+            if 0 <= y + dy < len(energies) and 0 <= x + dx < len(energies[y]):
+                if energies[y + dy][x + dx] != -1:
+                    energies[y + dy][x + dx] += 1
+                    if energies[y + dy][x + dx] > 9:
+                        newFlashes += flash(energies, x + dx, y + dy)
+    return newFlashes
+
+
+def day11(inputString):
+    energies = [list(map(int, x)) for x in inputString.split("\n")][:-1]
+
+    totalFlashes = 0
+    allFlashStep = -1
+
+    step = 0
+
+    while allFlashStep == -1 or step < 100:
+        for y in range(len(energies)):
+            for x in range(len(energies[y])):
+                energies[y][x] += 1
+        newFlashes = 0
+        for y in range(len(energies)):
+            for x in range(len(energies[y])):
+                if energies[y][x] > 9:
+                    newFlashes += flash(energies, x, y)
+        for y in range(len(energies)):
+            for x in range(len(energies[y])):
+                if energies[y][x] == -1:
+                    energies[y][x] = 0
+
+        # print(newFlashes)
+        # for y in range(len(energies)):
+        #     for x in range(len(energies[y])):
+        #         if energies[y][x] == -1:
+        #             print(" ", end="")
+        #         else:
+        #             print(energies[y][x], end="")
+        #     print()
+        if step < 100:
+            totalFlashes += newFlashes
+
+        if newFlashes == 100 and allFlashStep == -1:
+            allFlashStep = step
+
+        step += 1
+
+    print(f"Day 11 Part 1: {totalFlashes}")
+    print(f"Day 11 Part 1: {allFlashStep + 1}")
+
+
+days = [day1, day2, day3, day4, day5, day6, day7, day8, day9, day10, day11]
 
 
 def main():
